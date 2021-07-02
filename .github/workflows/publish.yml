@@ -1,0 +1,22 @@
+name: Publish
+
+on:
+  push:
+   branches:
+     - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      PACKAGES_USER: ${{ secrets.PACKAGES_USER }}
+      PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+    steps:
+      - name: Set env
+        run: |
+          echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
+          echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - name: Publish
+        working-directory: 00_publishing-a-package
+        run: ./gradlew publish
