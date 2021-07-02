@@ -1,0 +1,44 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.5.20"
+    // id "maven" // Deprecated from Gradle 7.x
+    id "maven-publish"
+}
+
+dependencies {
+    implementation "com.example:math:0.1.0-SNAPSHOT"
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/rachelcarmena/test-gh-packages")
+        credentials {
+            username = System.getenv("PACKAGES_USER")
+            password = System.getenv("PACKAGES_TOKEN")
+        }
+    }
+}
+
+jar {
+    archiveBaseName = ARTIFACT_ID
+    archiveVersion = VERSION
+    manifest {
+        attributes(
+            "Main-Class": "com.example.SandboxKt", 
+            "Class-Path": "math-0.1.0-SNAPSHOT.jar" 
+        )
+    }
+}
+
+publishing {
+    publications {
+        gpr(MavenPublication) {
+            groupId = GROUP_ID
+            artifactId = ARTIFACT_ID
+            version = VERSION
+
+            from(components.java)
+        }
+    }
+}

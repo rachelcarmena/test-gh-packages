@@ -1,0 +1,37 @@
+name: Build
+
+# on: pull_request
+on:
+  push:
+   branches:
+     - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PACKAGES_USER: ${{ secrets.PACKAGES_USER }}
+      PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+    steps:
+      - name: Set env
+        run: |
+          echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
+          echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
+          # sudo apt-get install tree
+      - uses: actions/checkout@v2
+      - name: Using a published package
+        working-directory: 01_using-a-published-package
+        run: |
+          ./gradlew assemble
+      - name: Running publishToMavenLocal
+        working-directory: 01_using-a-published-package
+        run: |
+          ./gradlew publishToMavenLocal
+          tree ~/.m2/repository
+      - name: Clean local repository
+        run: rm -rf ~/.m2/repository/*
+      - name: Running install
+        working-directory: 01_installing-a-package
+        run: |
+          mvn install -s settings.xml
+          tree ~/.m2/repository
